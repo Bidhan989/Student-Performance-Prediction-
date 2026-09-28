@@ -1,8 +1,15 @@
 from pathlib import Path
+import os
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = 'change-this-in-production'
-DEBUG = True
+
+SECRET_KEY = os.environ.get(
+    'DJANGO_SECRET_KEY',
+    'django-insecure-local-development-key'
+)
+
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() == 'true'
 # '*' keeps the project runnable out of the box on localhost, a LAN IP,
 # or a tunnelled/deployed host (e.g. ngrok, PythonAnywhere) without editing
 # this file. Replace with your real domain(s) before going to production.
