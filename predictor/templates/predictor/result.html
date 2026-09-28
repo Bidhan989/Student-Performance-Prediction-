@@ -1,0 +1,49 @@
+{% extends 'predictor/base.html' %}
+{% block title %}Prediction Result — StudentAI{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div><p class="eyebrow">ASSESSMENT COMPLETE</p><h1>Your prediction result</h1><p>Generated {{ record.created_at|date:'M d, Y H:i' }} using the trained ML pipeline.</p></div>
+  <a class="btn" href="{% url 'predict' %}">＋ New Prediction</a>
+</section>
+
+<section class="result-grid">
+  <article class="score-card featured"><small>Estimated Overall Average</small><strong>{{ record.estimated_average|floatformat:2 }}</strong><span>{{ record.performance_category }}</span></article>
+  <article class="score-card"><small>Predicted Mathematics</small><strong>{{ record.predicted_math_score|floatformat:2 }}</strong><span>Ensemble of Ridge + XGBoost</span></article>
+  <article class="score-card"><small>Final Classification</small><strong class="{% if record.pass_fail == 'Pass' %}positive{% else %}negative{% endif %}">{{ record.pass_fail }}</strong><span>XGBoost classification decision</span></article>
+</section>
+
+<section class="panel">
+  <div class="panel-head"><div><p class="eyebrow">CLASSIFICATION</p><h2>Prediction confidence</h2></div></div>
+  <div class="confidence">
+    <div><div class="confidence-label"><span>Pass</span><b>{{ record.pass_probability|floatformat:1 }}%</b></div><div class="bar"><i class="pass-bar" style="width:{{ record.pass_probability|floatformat:0 }}%"></i></div></div>
+    <div><div class="confidence-label"><span>Fail</span><b>{{ record.fail_probability|floatformat:1 }}%</b></div><div class="bar"><i class="fail-bar" style="width:{{ record.fail_probability|floatformat:0 }}%"></i></div></div>
+  </div>
+  <div class="model-output-grid">
+    <div><small>Ridge Regression</small><strong>{{ record.ridge_math|floatformat:2 }}</strong></div>
+    <div><small>XGBoost Regression</small><strong>{{ record.xgb_math|floatformat:2 }}</strong></div>
+    <div><small>SVM Classifier</small><strong>{{ record.svm_prediction }}</strong></div>
+    <div><small>XGBoost Classifier</small><strong>{{ record.xgb_prediction }}</strong></div>
+  </div>
+</section>
+
+{% if metrics %}
+<section class="panel">
+  <div class="panel-head"><div><p class="eyebrow">BENCHMARK</p><h2>Model performance on the test set</h2></div></div>
+  <p class="section-note">These are evaluation metrics from the same <code>train_models.py</code> run that generated the saved model bundle.</p>
+  <div class="metric-grid">
+    {% for name,m in metrics.regression.items %}<article class="metric-card"><div class="metric-type">REGRESSION</div><h3>{{ name }}</h3><div class="metric-row"><span>R²</span><b>{{ m.r2|floatformat:4 }}</b></div><div class="metric-row"><span>MAE</span><b>{{ m.mae|floatformat:4 }}</b></div><div class="metric-row"><span>RMSE</span><b>{{ m.rmse|floatformat:4 }}</b></div></article>{% endfor %}
+    {% for name,m in metrics.classification.items %}<article class="metric-card"><div class="metric-type">CLASSIFICATION</div><h3>{{ name }}</h3><div class="metric-row"><span>Accuracy</span><b>{{ m.accuracy|floatformat:2 }}</b></div><div class="metric-row"><span>Precision</span><b>{{ m.precision|floatformat:2 }}</b></div><div class="metric-row"><span>Recall</span><b>{{ m.recall|floatformat:2 }}</b></div><div class="metric-row"><span>F1</span><b>{{ m.f1|floatformat:2 }}</b></div></article>{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section class="panel">
+  <div class="panel-head"><div><p class="eyebrow">INPUT PROFILE</p><h2>Assessment details</h2></div></div>
+  <div class="detail-grid">
+    <p><small>Gender</small>{{ record.gender|title }}</p><p><small>Race/Ethnicity</small>{{ record.race_ethnicity|title }}</p>
+    <p><small>Parental Education</small>{{ record.parental_education|title }}</p><p><small>Lunch</small>{{ record.lunch|title }}</p>
+    <p><small>Test Preparation</small>{{ record.test_preparation|title }}</p><p><small>Reading Score</small>{{ record.reading_score }}</p>
+    <p><small>Writing Score</small>{{ record.writing_score }}</p><p><small>Pass Threshold</small>60</p>
+  </div>
+</section>
+{% endblock %}

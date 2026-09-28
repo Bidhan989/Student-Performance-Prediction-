@@ -1,0 +1,17 @@
+{% extends 'predictor/base.html' %}
+{% block title %}Delete {{ person.username }} — StudentAI{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div><p class="eyebrow">DANGER ZONE</p><h1>Delete this account?</h1><p>This permanently removes <strong>{{ person.username }}</strong> and all {{ person.predictions.count }} of their saved predictions. This cannot be undone.</p></div>
+</section>
+
+<section class="form-shell panel">
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-actions">
+      <a class="ghost" href="{% url 'user_detail' person.pk %}">Cancel</a>
+      <button type="submit" class="btn danger-btn">Yes, delete account</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

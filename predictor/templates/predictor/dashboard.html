@@ -1,0 +1,44 @@
+{% extends 'predictor/base.html' %}
+{% block title %}Dashboard — StudentAI{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">PERSONAL DASHBOARD</p>
+    <h1>Welcome, {{ user.username }}.</h1>
+    <p>Track your assessments, results and model-assisted predictions.</p>
+  </div>
+  <a class="btn" href="{% url 'predict' %}">＋ New Prediction</a>
+</section>
+
+<section class="stats">
+  <div><small>Total Predictions</small><strong>{{ total }}</strong><span class="stat-note">Your saved assessments</span></div>
+  <div><small>Pass Rate</small><strong>{{ pass_rate }}%</strong><span class="stat-note">{{ passed }} pass · {{ failed }} fail</span></div>
+  <div><small>Average Estimated Score</small><strong>{{ average }}</strong><span class="stat-note">Across your predictions</span></div>
+</section>
+
+<section class="panel">
+  <div class="panel-head"><div><p class="eyebrow">ACTIVITY</p><h2>Recent predictions</h2></div><a href="{% url 'history' %}">View all →</a></div>
+  {% if recent %}
+  <div class="table-wrap"><table><thead><tr><th>Date</th><th>Math</th><th>Average</th><th>Category</th><th>Decision</th></tr></thead><tbody>
+  {% for p in recent %}<tr><td>{{ p.created_at|date:'M d, Y H:i' }}</td><td><strong>{{ p.predicted_math_score|floatformat:2 }}</strong></td><td>{{ p.estimated_average|floatformat:2 }}</td><td>{{ p.performance_category }}</td><td><span class="status {{ p.pass_fail|lower }}">{{ p.pass_fail }}</span></td></tr>{% endfor %}
+  </tbody></table></div>
+  {% else %}
+  <div class="empty"><div class="empty-icon">◎</div><h3>No predictions yet</h3><p>Create your first assessment to start building your performance history.</p><a class="btn" href="{% url 'predict' %}">Create prediction</a></div>
+  {% endif %}
+</section>
+
+{% if metrics %}
+<section class="panel">
+  <div class="panel-head"><div><p class="eyebrow">MODEL PERFORMANCE</p><h2>How the trained models performed</h2></div></div>
+  <p class="section-note">Metrics below are calculated on the held-out 20% test set by <code>train_models.py</code>.</p>
+  <div class="metric-grid">
+    {% for name,m in metrics.regression.items %}
+    <article class="metric-card"><div class="metric-type">REGRESSION</div><h3>{{ name }}</h3><div class="metric-row"><span>R²</span><b>{{ m.r2|floatformat:4 }}</b></div><div class="metric-row"><span>MAE</span><b>{{ m.mae|floatformat:4 }}</b></div><div class="metric-row"><span>RMSE</span><b>{{ m.rmse|floatformat:4 }}</b></div></article>
+    {% endfor %}
+    {% for name,m in metrics.classification.items %}
+    <article class="metric-card"><div class="metric-type">CLASSIFICATION</div><h3>{{ name }}</h3><div class="metric-row"><span>Accuracy</span><b>{{ m.accuracy|floatformat:2 }}</b></div><div class="metric-row"><span>Precision</span><b>{{ m.precision|floatformat:2 }}</b></div><div class="metric-row"><span>Recall</span><b>{{ m.recall|floatformat:2 }}</b></div><div class="metric-row"><span>F1</span><b>{{ m.f1|floatformat:2 }}</b></div></article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

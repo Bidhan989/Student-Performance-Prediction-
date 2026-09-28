@@ -1,0 +1,35 @@
+{
+  "dataset": {
+    "rows": 1000,
+    "features_used": 7,
+    "test_size": 0.2,
+    "random_state": 42,
+    "pass_threshold": 60
+  },
+  "regression": {
+    "Ridge Regression": {
+      "mae": 4.1302,
+      "rmse": 5.3173,
+      "r2": 0.8838
+    },
+    "XGBoost Regression": {
+      "mae": 4.6598,
+      "rmse": 5.9604,
+      "r2": 0.854
+    }
+  },
+  "classification": {
+    "SVM Classifier": {
+      "accuracy": 0.935,
+      "precision": 0.9771,
+      "recall": 0.9275,
+      "f1": 0.9517
+    },
+    "XGBoost Classifier": {
+      "accuracy": 0.965,
+      "precision": 0.9645,
+      "recall": 0.9855,
+      "f1": 0.9749
+    }
+  }
+}

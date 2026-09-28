@@ -1,0 +1,10 @@
+{% extends 'predictor/base.html' %}
+{% block title %}History — StudentAI{% endblock %}
+{% block content %}
+<section class="page-head"><div><p class="eyebrow">YOUR DATA</p><h1>Prediction history</h1><p>Every assessment is linked to your account and stored in the Django database.</p></div><a class="btn" href="{% url 'predict' %}">＋ New Prediction</a></section>
+<section class="panel table-panel">
+<div class="table-wrap"><table><thead><tr><th>Date</th><th>Math</th><th>Average</th><th>Category</th><th>Decision</th><th>XGBoost</th></tr></thead><tbody>
+{% for p in records %}<tr><td>{{ p.created_at|date:'M d, Y H:i' }}</td><td>{{ p.predicted_math_score|floatformat:2 }}</td><td>{{ p.estimated_average|floatformat:2 }}</td><td>{{ p.performance_category }}</td><td><span class="status {{ p.pass_fail|lower }}">{{ p.pass_fail }}</span></td><td>{{ p.xgb_prediction }}</td></tr>
+{% empty %}<tr><td colspan="6"><div class="empty"><h3>No prediction records</h3><p>Your completed assessments will appear here.</p></div></td></tr>{% endfor %}
+</tbody></table></div></section>
+{% endblock %}

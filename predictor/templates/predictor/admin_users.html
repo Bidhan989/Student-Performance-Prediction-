@@ -1,0 +1,38 @@
+{% extends 'predictor/base.html' %}
+{% block title %}Manage Users — StudentAI{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div><p class="eyebrow">STAFF CONTROL CENTER</p><h1>Manage users</h1><p>Every registered account on StudentAI. Search, inspect, edit or remove accounts.</p></div>
+  <a class="btn" href="{% url 'user_add' %}">＋ Add user</a>
+</section>
+
+<section class="panel">
+  <form method="get" class="user-search">
+    <input type="text" name="q" value="{{ query }}" placeholder="Search by username or email…">
+    <button type="submit" class="ghost">Search</button>
+    {% if query %}<a class="ghost" href="{% url 'user_list' %}">Clear</a>{% endif %}
+  </form>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Username</th><th>Email</th><th>Role</th><th>Status</th><th>Predictions</th><th>Joined</th><th>Last login</th><th></th></tr></thead>
+      <tbody>
+      {% for u in users %}
+        <tr>
+          <td><strong>{{ u.username }}</strong>{% if u == request.user %} <span class="badge">You</span>{% endif %}</td>
+          <td>{{ u.email|default:"—" }}</td>
+          <td>{% if u.is_superuser %}Superuser{% elif u.is_staff %}Staff{% else %}Student{% endif %}</td>
+          <td><span class="status {% if u.is_active %}pass{% else %}fail{% endif %}">{% if u.is_active %}Active{% else %}Disabled{% endif %}</span></td>
+          <td>{{ u.prediction_count }}</td>
+          <td>{{ u.date_joined|date:'M d, Y' }}</td>
+          <td>{{ u.last_login|date:'M d, Y H:i'|default:"Never" }}</td>
+          <td><a class="ghost small" href="{% url 'user_detail' u.pk %}">View →</a></td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="8"><div class="empty"><h3>No users found</h3><p>Try a different search term.</p></div></td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

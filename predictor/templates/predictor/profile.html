@@ -1,0 +1,6 @@
+{% extends 'predictor/base.html' %}
+{% block title %}Profile — StudentAI{% endblock %}
+{% block content %}
+<section class="page-head"><div><p class="eyebrow">ACCOUNT</p><h1>Your profile</h1><p>Account information and prediction activity.</p></div></section>
+<section class="panel profile"><p><small>Username</small><strong>{{ user.username }}</strong></p><p><small>Email</small><strong>{{ user.email|default:'Not provided' }}</strong></p><p><small>Joined</small><strong>{{ user.date_joined|date:'M d, Y' }}</strong></p><p><small>Predictions</small><strong>{{ user.predictions.count }}</strong></p></section>
+{% endblock %}

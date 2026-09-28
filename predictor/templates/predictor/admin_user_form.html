@@ -1,0 +1,34 @@
+{% extends 'predictor/base.html' %}
+{% block title %}{% if mode == 'add' %}Add User{% else %}Edit {{ person.username }}{% endif %} — StudentAI{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">{% if mode == 'add' %}NEW ACCOUNT{% else %}ACCOUNT SETTINGS{% endif %}</p>
+    <h1>{% if mode == 'add' %}Add a new user{% else %}Edit {{ person.username }}{% endif %}</h1>
+    <p>{% if mode == 'add' %}Create a login for a student or staff member.{% else %}Update account details and access level.{% endif %}</p>
+  </div>
+  <a class="ghost" href="{% if mode == 'add' %}{% url 'user_list' %}{% else %}{% url 'user_detail' person.pk %}{% endif %}">← Back</a>
+</section>
+
+<section class="form-shell panel">
+  <form method="post" class="form-grid">
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="field {% if field.name == 'is_staff' or field.name == 'is_active' %}checkbox-field{% endif %}">
+        {% if field.field.widget.input_type == 'checkbox' %}
+          <label>{{ field }} {{ field.label }}</label>
+        {% else %}
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+        {% endif %}
+        {% if field.help_text %}<span class="help">{{ field.help_text|safe }}</span>{% endif %}
+        {{ field.errors }}
+      </div>
+    {% endfor %}
+    <div class="form-actions">
+      <a class="ghost" href="{% if mode == 'add' %}{% url 'user_list' %}{% else %}{% url 'user_detail' person.pk %}{% endif %}">Cancel</a>
+      <button type="submit" class="btn">{% if mode == 'add' %}Create account{% else %}Save changes{% endif %}</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

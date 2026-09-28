@@ -1,0 +1,56 @@
+{% extends 'predictor/base.html' %}
+{% block title %}{{ person.username }} — StudentAI{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div><p class="eyebrow">USER ACCOUNT</p><h1>{{ person.username }}</h1><p>{{ person.email|default:"No email on file" }}</p></div>
+  <a class="ghost" href="{% url 'user_list' %}">← Back to users</a>
+</section>
+
+<section class="stats admin-stats">
+  <div><small>Role</small><strong>{% if person.is_superuser %}Superuser{% elif person.is_staff %}Staff{% else %}Student{% endif %}</strong><span class="stat-note">Account type</span></div>
+  <div><small>Status</small><strong>{% if person.is_active %}Active{% else %}Disabled{% endif %}</strong><span class="stat-note">Can log in?</span></div>
+  <div><small>Predictions</small><strong>{{ predictions.count }}</strong><span class="stat-note">Saved assessments</span></div>
+  <div><small>Joined</small><strong>{{ person.date_joined|date:'M d, Y' }}</strong></div>
+  <div><small>Last login</small><strong>{{ person.last_login|date:'M d, Y H:i'|default:"Never" }}</strong></div>
+</section>
+
+<section class="panel">
+  <div class="panel-head"><div><p class="eyebrow">ACCOUNT ACTIONS</p><h2>Manage this account</h2></div></div>
+  <div class="admin-actions user-actions">
+    <a class="action-card" href="{% url 'user_edit' person.pk %}"><strong>Edit details</strong><span>Username, email, staff access, active status →</span></a>
+    <a class="action-card" href="{% url 'user_set_password' person.pk %}"><strong>Set password</strong><span>Assign a new password for this user →</span></a>
+    {% if person != request.user %}
+    <a class="action-card danger" href="{% url 'user_delete' person.pk %}"><strong>Delete account</strong><span>Removes the user and all of their predictions →</span></a>
+    {% endif %}
+  </div>
+</section>
+
+<section class="panel">
+  <div class="panel-head"><div><p class="eyebrow">HISTORY</p><h2>Predictions made by this user</h2></div></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Date</th><th>Math</th><th>Average</th><th>Category</th><th>Decision</th><th>XGBoost</th><th></th></tr></thead>
+      <tbody>
+      {% for p in predictions %}
+        <tr>
+          <td>{{ p.created_at|date:'M d, Y H:i' }}</td>
+          <td><strong>{{ p.predicted_math_score|floatformat:2 }}</strong></td>
+          <td>{{ p.estimated_average|floatformat:2 }}</td>
+          <td>{{ p.performance_category }}</td>
+          <td><span class="status {{ p.pass_fail|lower }}">{{ p.pass_fail }}</span></td>
+          <td>{{ p.xgb_prediction }}</td>
+          <td>
+            <a class="ghost small" href="{% url 'result' p.pk %}">View</a>
+            <form action="{% url 'prediction_delete' p.pk %}" method="post" class="inline" onsubmit="return confirm('Delete this prediction record?');">
+              {% csrf_token %}<button type="submit" class="ghost small danger">Delete</button>
+            </form>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="7"><div class="empty"><h3>No predictions yet</h3><p>This user hasn't submitted any assessments.</p></div></td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
